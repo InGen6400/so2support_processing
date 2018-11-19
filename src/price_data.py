@@ -1,12 +1,14 @@
 
-class SaleData:
+class SaleData(object):
 
-    def __init__(self, price, pos_x, pos_y, area_id, num):
+    def __init__(self, price, pos_x, pos_y, area_id, num, bundle, user):
         self.price = price
+        self.num = num
+        self.area_id = area_id
         self.pos_x = pos_x
         self.pos_y = pos_y
-        self.area_id = area_id
-        self.num = num
+        self.bundle = bundle
+        self.user = user
 
     def __radd__(self, other):
         return other + self.price
@@ -14,10 +16,12 @@ class SaleData:
     def to_dict(self):
         ret = {
             u'price': self.price,
+            u'num': self.num,
+            u'area_id': self.area_id,
             u'pos_x': self.pos_x,
             u'pos_y': self.pos_y,
-            u'area_id': self.area_id,
-            u'unit': self.num,
+            u'bundle': self.bundle,
+            u'user': self.user
         }
         return ret
 
@@ -37,11 +41,25 @@ class SaleList(object):
     def add_individual(self, price, pos_x, pos_y, area_id, unit):
         self.sale_data.append(SaleData(price, pos_x, pos_y, area_id, unit))
 
+    def sum_num(self):
+        num = 0
+        for data in self.sale_data:
+            num = num + data.num
+        return num
+
+    def sum_price(self):
+        price = 0
+        for data in self.sale_data:
+            price = price + data.price
+        return price
+
+    # 最低，最大価格．平均，トップ5を計算する．
     def calc(self):
         self.sale_data = sorted(self.sale_data, key=lambda u: u.price)
         min_price = self.sale_data[0].price
         max_price = self.sale_data[-1].price
-        ave = sum(self.sale_data)/len(self.sale_data)
+        ave = self.sum_price()/self.sum_num()
+        # 最大で5つ，配列の長さが5以下なら配列の長さ
         top5 = self.sale_data[:min(len(self.sale_data), 5)]
         return min_price, max_price, ave, top5
 
