@@ -1,10 +1,5 @@
 
 class ItemData(object):
-    id = -1
-    name = "未定義アイテム"
-    category = "未定義カテゴリ"
-    scale = "個(未定義)"
-    sort = -1
 
     def __init__(self, id_in, name, category, scale, sort):
         self.id = id_in
