@@ -4,7 +4,11 @@ from firebase_admin import firestore
 from src import JsonItemImporter as jsonImp
 from src import converter
 import pprint
+import datetime
 
+print(datetime.datetime.today().hour)
+
+'''
 json_dict = jsonImp.load_json_file('resources/item.json')
 item_list = converter.convert_item_list(json_dict)
 
@@ -30,3 +34,4 @@ fp = ['1', '2', '3']
 doc = doc_ref.get(fp)
 # item = item_data.ItemData.from_dict(doc.to_dict())
 pprint.pprint(doc.to_dict())
+'''

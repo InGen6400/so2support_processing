@@ -1,5 +1,5 @@
 
-class SaleData(object):
+class SaleData(object)  :
 
     def __init__(self, price, pos_x, pos_y, area_id, num, bundle, user):
         self.price = price
