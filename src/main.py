@@ -1,12 +1,32 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from src import JsonItemImporter as jsonImp
-from src import converter
+from src import save_data
+from src import sale_data
 import pprint
 import datetime
 
-print(datetime.datetime.today().hour)
+
+data = save_data.SaveData()
+'''
+data.load()
+pprint.pprint(data.save_items)
+'''
+data.add_sale('1', sale_data.SaleData(10, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('2', sale_data.SaleData(20, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('1', sale_data.SaleData(30, 1, 1, 3, 1000, 0, 3326))
+data.on_change_hour()
+data.add_sale('4', sale_data.SaleData(60, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('2', sale_data.SaleData(20, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('2', sale_data.SaleData(10, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('2', sale_data.SaleData(60, 1, 1, 3, 1000, 0, 3326))
+data.add_sale('1', sale_data.SaleData(30, 1, 1, 3, 1000, 0, 3326))
+data.on_change_hour()
+pprint.pprint(data.save_items)
+data.on_change_day()
+pprint.pprint(data.save_items)
+data.save()
+
 
 '''
 json_dict = jsonImp.load_json_file('resources/item.json')
