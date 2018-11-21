@@ -3,15 +3,17 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from src import save_data
 from src import sale_data
+from src import converter
+from src import json_loader
 import pprint
 import datetime
+
 
 
 data = save_data.SaveData()
 '''
 data.load()
 pprint.pprint(data.save_items)
-'''
 data.add_sale('1', sale_data.SaleData(10, 1, 1, 3, 1000, 0, 3326))
 data.add_sale('2', sale_data.SaleData(20, 1, 1, 3, 1000, 0, 3326))
 data.add_sale('1', sale_data.SaleData(30, 1, 1, 3, 1000, 0, 3326))
@@ -28,13 +30,15 @@ pprint.pprint(data.save_items)
 data.save()
 
 
-'''
-json_dict = jsonImp.load_json_file('resources/item.json')
+json_dict = json_loader.load_json_file('resources/item.json')
 item_list = converter.convert_item_list(json_dict)
 
-json_dict = jsonImp.load_json_file('resources/all.json')
+'''
+json_dict = json_loader.load_json_file('resources/all.json')
+pprint.pprint(json_dict)
 price_dict = converter.convert_price_list(json_dict)
 
+'''
 cred = credentials.Certificate('private/serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 

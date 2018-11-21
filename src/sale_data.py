@@ -1,7 +1,7 @@
 
 class SaleData(object)  :
 
-    def __init__(self, price, pos_x, pos_y, area_id, num, bundle, user):
+    def __init__(self, price, num, area_id, pos_x, pos_y, bundle, user):
         self.price = price
         self.num = num
         self.area_id = area_id

@@ -1,6 +1,7 @@
 import pickle
 import datetime
 import os
+from src import sale_data
 
 save_dir = 'save'
 graph_dir = 'save/graph'
@@ -87,6 +88,21 @@ class SaveData(object):
         else:
             self.save_items[item_id_str] = \
                 SaveItem(sale_data)
+
+    def load_json(self, json_dict):
+        """
+        :type json_dict: dict
+        :rtype: int
+        """
+        n_loaded = 0
+        for one_data in json_dict:
+            if one_data['item_id'] < 5000:
+                data = sale_data.SaleData(one_data['price'], one_data['unit'], one_data['area_id'], one_data['pos_x'],
+                                          one_data['pos_y'], one_data['bundle_sale'], one_data['user_id'])
+                self.add_sale(one_data['item_id'], data)
+                n_loaded = n_loaded + 1
+
+        return n_loaded
 
     def save(self):
         with open(os.path.join(save_dir, 'save_data.pkl'), mode='wb') as f:

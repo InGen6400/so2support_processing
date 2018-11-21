@@ -17,9 +17,9 @@ def convert_price_list(json_data):
     tmp_dict = {}
     ret_dict = {}
     for one_data in json_data:
-        price = sale_data.SaleData(one_data['price'], one_data['pos_x'], one_data['pos_y'],
-                                   one_data['area_id'], one_data['unit'])
-        if one_data['item_id'] < 1000000:
+        price = sale_data.SaleData(one_data['price'], one_data['unit'], one_data['area_id'],
+                                   one_data['pos_x'], one_data['pos_y'], one_data['bundle_sale'], one_data['user_id'])
+        if one_data['item_id'] < 5000:
             if one_data['item_id'] in tmp_dict:
                 tmp_dict[one_data['item_id']].add(price)
             else:
