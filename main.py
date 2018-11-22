@@ -9,34 +9,11 @@ import pprint
 import datetime
 
 
-
 data = save_data.SaveData()
-'''
-data.load()
-pprint.pprint(data.save_items)
-data.add_sale('1', sale_data.SaleData(10, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('2', sale_data.SaleData(20, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('1', sale_data.SaleData(30, 1, 1, 3, 1000, 0, 3326))
-data.on_change_hour()
-data.add_sale('4', sale_data.SaleData(60, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('2', sale_data.SaleData(20, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('2', sale_data.SaleData(10, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('2', sale_data.SaleData(60, 1, 1, 3, 1000, 0, 3326))
-data.add_sale('1', sale_data.SaleData(30, 1, 1, 3, 1000, 0, 3326))
-data.on_change_hour()
-pprint.pprint(data.save_items)
-data.on_change_day()
-pprint.pprint(data.save_items)
 data.save()
-
-
-json_dict = json_loader.load_json_file('resources/item.json')
-item_list = converter.convert_item_list(json_dict)
-
-'''
-json_dict = json_loader.load_json_file('resources/all.json')
-pprint.pprint(json_dict)
-price_dict = converter.convert_price_list(json_dict)
+json_dict = json_loader.load_json_file('resources/all.json', data.mod_time)
+data.load_json(json_dict)
+pprint.pprint(data.save_items)
 
 '''
 cred = credentials.Certificate('private/serviceAccountKey.json')

@@ -62,6 +62,10 @@ class SaveData(object):
         self.save_items = {}
         self.day = datetime.datetime.today().day
         self.hour = datetime.datetime.today().hour
+        self.mod_time = 0
+        if os.path.exists(os.path.join(save_dir, 'save_data.pkl')) & \
+                os.path.exists(os.path.join(save_dir, 'time_data.pkl')):
+            self.load()
 
     def on_change_day(self):
         for item in self.save_items.values():
@@ -71,7 +75,7 @@ class SaveData(object):
         for item in self.save_items.values():
             item.change_hour()
 
-    def add_sale(self, item_id_str, sale_data):
+    def add_sale(self, item_id_str, sale):
         # 日付が変わった
         if self.day != datetime.date.today().day:
             self.day = datetime.date.today().day
@@ -84,10 +88,10 @@ class SaveData(object):
 
         # すでに同じIDのアイテムがあるなら追加，ないなら新規作成
         if item_id_str in self.save_items:
-            self.save_items[item_id_str].add(sale_data)
+            self.save_items[item_id_str].add(sale)
         else:
             self.save_items[item_id_str] = \
-                SaveItem(sale_data)
+                SaveItem(sale)
 
     def load_json(self, json_dict):
         """
@@ -110,6 +114,7 @@ class SaveData(object):
         with open(os.path.join(save_dir, 'time_data.pkl'), mode='wb') as f:
             pickle.dump(self.day, f)
             pickle.dump(self.hour, f)
+            pickle.dump(self.mod_time, f)
 
     def load(self):
         with open(os.path.join(save_dir, 'save_data.pkl'), mode='rb') as f:
@@ -117,4 +122,5 @@ class SaveData(object):
         with open(os.path.join(save_dir, 'time_data.pkl'), mode='rb') as f:
             self.day = pickle.load(f)
             self.hour = pickle.load(f)
-
+            self.mod_time = pickle.load(f)
+        print('>>>>>>>>>>>>  SAVE DATA LOADED!!  <<<<<<<<<<<<')
