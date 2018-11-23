@@ -22,11 +22,11 @@ class SaveItem(object):
 
     def __init__(self, sale):
         # week_sales[7*120]
-        self.week_sales = [sale]
+        self.week_sales = [sale]  # type: list[sale_data]
         # hour_sales[<5]
-        self.hour_sales = [sale]
+        self.hour_sales = [sale]  # type: list[sale_data]
         # today_graph[<24]
-        self.today_graph = []
+        self.today_graph = []  # type: list[GraphData]
 
     # データの追加
     def add(self, sale):
@@ -59,7 +59,7 @@ class SaveItem(object):
 class SaveData(object):
 
     def __init__(self):
-        self.save_items = {}
+        self.save_items = {}  # type: dict[str, sale_data]
         self.day = datetime.datetime.today().day
         self.hour = datetime.datetime.today().hour
         self.mod_time = 0

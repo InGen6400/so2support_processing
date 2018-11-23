@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from src import save_data
+from src import send_data
 from src import sale_data
 from src import converter
 from src import json_loader
@@ -10,10 +11,11 @@ import datetime
 
 
 data = save_data.SaveData()
-data.save()
 json_dict = json_loader.load_json_file('resources/all.json', data.mod_time)
 data.load_json(json_dict)
-pprint.pprint(data.save_items)
+sends = send_data.SendData()
+sends.load(data)
+pprint.pprint(sends.to_dict())
 
 '''
 cred = credentials.Certificate('private/serviceAccountKey.json')
