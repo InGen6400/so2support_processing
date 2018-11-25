@@ -26,4 +26,3 @@ class ItemData(object):
     def __repr__(self):
         return u'ItemData(id:{} name:{} category:{} scale:{} sort:{})'.format(
             self.id, self.name, self.category, self.scale, self.sort)
-

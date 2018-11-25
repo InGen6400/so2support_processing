@@ -1,6 +1,5 @@
 from src import save_data
-from src import sale_data
-
+from src import item_data
 
 class SendItem(object):
 
@@ -70,8 +69,14 @@ class SendData(object):
             ave3 = sum_price/ave_num
             self.send_items[key] = SendItem(cheap5_day, cheap5_week, ave3, cheapest)
 
-    def to_dict(self):
+    def to_dict(self, category, item_dict):
+        """
+        :param str category:
+        :param dict[str, dict] item_dict:
+        :return dict:
+        """
         ret_dict = {}
         for key, item in self.send_items.items():
-            ret_dict[key] = item.to_dict()
+            if item_dict[key]['category'] == category:
+                ret_dict[key] = item.to_dict()
         return ret_dict

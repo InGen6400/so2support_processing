@@ -5,12 +5,12 @@ from src import sale_data
 
 def convert_item_list(json_data):
     ret_dict = {}
+    cats = set()
     for key, value in json_data.items():
         item = item_data.ItemData(key, value['name'], value['category'], value['scale'], value['sort'])
+        cats.add(value['category'])
         ret_dict[''+key] = item.to_dict()
-        if key == '20':
-            return ret_dict
-    return ret_dict
+    return ret_dict, cats
 
 
 def convert_price_list(json_data):
