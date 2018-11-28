@@ -31,37 +31,43 @@ class SaleData(object):
 
 class SaleList(object):
 
-    def __init__(self, in_data):
-        self.sale_data = []
-        self.add(in_data)
+    def __init__(self, in_data=None):
+        self.sale_datas = []  # type: list[SaleData]
+        if in_data is not None:
+            self.add(in_data)
 
     def add(self, in_data):
-        self.sale_data.append(in_data)
+        self.sale_datas.append(in_data)
 
-    def add_individual(self, price, pos_x, pos_y, area_id, unit):
-        self.sale_data.append(SaleData(price, pos_x, pos_y, area_id, unit))
+    def add_individual(self, price, num, area_id, pos_x, pos_y, bundle, user):
+        self.sale_datas.append(SaleData(price, num, area_id, pos_x, pos_y, bundle, user))
 
     def sum_num(self):
         num = 0
-        for data in self.sale_data:
+        for data in self.sale_datas:
             num = num + data.num
         return num
 
     def sum_price(self):
         price = 0
-        for data in self.sale_data:
+        for data in self.sale_datas:
             price = price + data.price
         return price
 
     # 最低，最大価格．平均，トップ5を計算する．
     def calc(self):
-        self.sale_data = sorted(self.sale_data, key=lambda u: u.price)
-        min_price = self.sale_data[0].price
-        max_price = self.sale_data[-1].price
-        ave = self.sum_price()/self.sum_num()
-        # 最大で5つ，配列の長さが5以下なら配列の長さ
-        top5 = self.sale_data[:min(len(self.sale_data), 5)]
-        return min_price, max_price, ave, top5
+        if self.sale_datas:
+            self.sale_datas = sorted(self.sale_datas, key=lambda u: u.price)
+            min_price = self.sale_datas[0].price
+            if self.sale_datas.__len__() == 1:
+                max_price = self.sale_datas[0].price
+            else:
+                max_price = self.sale_datas[-1].price
+            ave = self.sum_price()/self.sum_num()
+            # 最大で5つ，配列の長さが5以下なら配列の長さ
+            top5 = self.sale_datas[:min(len(self.sale_datas), 5)]
+            return min_price, max_price, ave, top5
+        return 100000000, 0, 0, []
 
     def to_dict(self):
         min_price, max_price, ave, top5 = self.calc()

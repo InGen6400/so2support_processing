@@ -1,12 +1,13 @@
 from src import save_data
-from src import item_data
+from src import sale_data
+
 
 class SendItem(object):
 
     def __init__(self, cheap5_day, cheap5_week, ave3, cheapest):
         """
-        :type cheap5_day: list[dict[str, int]]
-        :type cheap5_week: list[dict[str, int]]
+        :type cheap5_day: list[dict[str, sale_data.SaleData]]
+        :type cheap5_week: list[dict[str, sale_data.SaleData]]
         :type ave3: float
         :type cheapest: dict[str, int]
         """
@@ -37,8 +38,8 @@ class SendData(object):
         for key, item in save.save_items.items():
             save_item = save.save_items[key]  # type: save_data.SaveItem
             sum_price = 0
-            cheap5_day = []  # type: list[dict[str, int]]
-            cheap5_week = []  # type: list[dict[str, int]]
+            cheap5_day = []  # type: list[dict[str, sale_data.SaleData]]
+            cheap5_week = []  # type: list[dict[str, sale_data.SaleData]]
             cheapest = {}  # type: dict[str, int]
             day_num = 120*1
             # 3日分のデータもしくは配列の長さ分

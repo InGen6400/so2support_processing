@@ -11,31 +11,28 @@ n_sale_1day = 24*5
 
 class GraphData(object):
 
-    def __init__(self, ave):
+    def __init__(self, ave, hour):
         self.ave_price = ave
+        self.hour = hour
 
     def __repr__(self):
-        return 'GraphData: ave:{}'.format(self.ave_price)
+        return 'GraphData: ave:{} hour:{}'.format(self.ave_price, self.hour)
 
 
 class SaveItem(object):
 
     def __init__(self, sale):
         # week_sales[7*120]
-        self.week_sales = [sale]  # type: list[sale_data]
+        self.week_sale_lists = [sale_data.SaleList(sale)]  # type: list
         # hour_sales[<5]
-        self.hour_sales = [sale]  # type: list[sale_data]
+        self.hour_sale_lists = [sale_data.SaleList(sale)]  # type: list
         # today_graph[<24]
         self.today_graph = []  # type: list[GraphData]
 
     # データの追加
     def add(self, sale):
-        self.week_sales.insert(0, sale)
-        self.hour_sales.insert(0, sale)
-        # 一週間分のデータのみにする
-        self.week_sales = self.week_sales[:min(len(self.week_sales), 7*n_sale_1day)]
-        # 1時間分のデータのみにする
-        self.hour_sales = self.hour_sales[:min(len(self.week_sales), 24)]
+        self.week_sale_lists[0].add(sale)
+        self.hour_sale_lists[0].add(sale)
 
     # 日付が変わったらグラフデータをファイルに出力
     def change_day(self):
@@ -45,22 +42,24 @@ class SaveItem(object):
         self.today_graph = []
 
     # 時間が変わったら一時間の平均を今日のグラフデータに追加して一時間のデータを消す
-    def change_hour(self):
+    def change_hour(self, old, new):
         sum_price = 0
-        if self.hour_sales:
-            for hour_data in self.hour_sales:
-                sum_price = sum_price + hour_data.price
-            self.today_graph.append(sum_price/len(self.hour_sales))
-            self.hour_sales = []
+        sum_num = 0
+        if self.hour_sale_lists:
+            for sale_list in self.hour_sale_lists:
+                sum_price = sum_price + sale_list.sum_price()
+                sum_num = sum_num + sale_list.sum_num()
+            self.today_graph.append(GraphData(sum_price/sum_num, old))
+            self.hour_sale_lists.insert(0, sale_data.SaleList())
 
     def __repr__(self):
-        return 'SaveItem: \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sales, self.today_graph)
+        return 'SaveItem: \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sale_lists, self.today_graph)
 
 
 class SaveData(object):
 
     def __init__(self, day=datetime.datetime.today().day, hour=datetime.datetime.today().hour):
-        self.save_items = {}  # type: dict[str, sale_data]
+        self.save_items = {}  # type: dict[str, SaveItem]
         self.day = day
         self.hour = hour
         self.mod_time = datetime.datetime.today()
@@ -72,7 +71,7 @@ class SaveData(object):
         for item in self.save_items.values():
             item.change_day()
 
-    def on_change_hour(self):
+    def on_change_hour(self, old, new):
         for item in self.save_items.values():
             item.change_hour()
 
@@ -97,8 +96,8 @@ class SaveData(object):
 
         # 時間が変わった
         if self.hour != datetime.datetime.today().hour:
+            self.on_change_hour(self.hour, datetime.datetime.today().hour)
             self.hour = datetime.datetime.today().hour
-            self.on_change_hour()
 
         n_loaded = 0
         for one_data in json_dict:

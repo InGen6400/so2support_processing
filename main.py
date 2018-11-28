@@ -20,13 +20,19 @@ sends = send_data.SendData()
 # firebaseの初期化
 cred = credentials.Certificate('private/serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
-db = firestore.client()
+db = firestore.client()  # type: firestore.firestore.Client
 
 # アイテムデータの読み込み
 item_list = json_loader.load_json_file('resources/item.json')
 items, cats = converter.convert_item_list(item_list)
 
 delta_time = datetime.datetime.today() - data.mod_time
+
+col = db.collection('price_data')  # type: firestore.firestore.CollectionReference
+docs = col.get()
+for doc in docs:
+    print(u'{} => {}'.format(doc.id, doc.to_dict()))
+'''
 # 11分以上たっていないと実行されない
 if delta_time.seconds > 60*11:
     print('Accessing API & Downloading Json data....')
@@ -68,4 +74,4 @@ else:
     with open(os.path.join('save', 'log.txt'), 'a') as f:
         print('Failed-: ' + str(datetime.datetime.today()) + '\n\t Not Enough Times', file=f)
 
-
+'''
