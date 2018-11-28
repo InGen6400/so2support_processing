@@ -1,3 +1,5 @@
+from typing import List
+
 
 class SaleData(object):
 
@@ -31,8 +33,10 @@ class SaleData(object):
 
 class SaleList(object):
 
+    sale_datas: List[SaleData]
+
     def __init__(self, in_data=None):
-        self.sale_datas = []  # type: list[SaleData]
+        self.sale_datas = []
         if in_data is not None:
             self.add(in_data)
 
@@ -48,11 +52,14 @@ class SaleList(object):
             num = num + data.num
         return num
 
-    def sum_price(self):
-        price = 0
+    def sum_weighted_price(self):
+        w_price = 0
         for data in self.sale_datas:
-            price = price + data.price
-        return price
+            w_price = w_price + (data.price * data.num)
+        return w_price
+
+    def get_cheapest(self):
+        return min(self.sale_datas, key=lambda x: x.price)
 
     # 最低，最大価格．平均，トップ5を計算する．
     def calc(self):

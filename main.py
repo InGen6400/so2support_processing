@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from src import save_data
+from src import sale_data
 from src import send_data
 from src import json_loader
 from src import converter
@@ -11,7 +12,7 @@ import json
 import codecs
 import pprint
 import os
-
+'''
 PRICE_URL = 'https://so2-api.mutoys.com/json/sale/all.json'
 
 data = save_data.SaveData()
@@ -27,12 +28,6 @@ item_list = json_loader.load_json_file('resources/item.json')
 items, cats = converter.convert_item_list(item_list)
 
 delta_time = datetime.datetime.today() - data.mod_time
-
-col = db.collection('price_data')  # type: firestore.firestore.CollectionReference
-docs = col.get()
-for doc in docs:
-    print(u'{} => {}'.format(doc.id, doc.to_dict()))
-'''
 # 11分以上たっていないと実行されない
 if delta_time.seconds > 60*11:
     print('Accessing API & Downloading Json data....')
@@ -73,5 +68,4 @@ else:
     print('Not Enough Times')
     with open(os.path.join('save', 'log.txt'), 'a') as f:
         print('Failed-: ' + str(datetime.datetime.today()) + '\n\t Not Enough Times', file=f)
-
 '''

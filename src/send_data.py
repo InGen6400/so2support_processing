@@ -1,27 +1,50 @@
-from src import save_data
 from src import sale_data
+from src import save_data
 
 
 class SendItem(object):
 
-    def __init__(self, cheap5_day, cheap5_week, ave3, cheapest):
+    cheapest_now: sale_data.SaleData
+    cheap5_week_ave: float
+    cheap5_day_ave: float
+
+    def __init__(self, cheap5_day_ave=0, cheap5_week_ave=0, cheapest_now=None):
         """
-        :type cheap5_day: list[dict[str, sale_data.SaleData]]
-        :type cheap5_week: list[dict[str, sale_data.SaleData]]
-        :type ave3: float
-        :type cheapest: dict[str, int]
+        :param float cheap5_day_ave:
+        :param float cheap5_week_ave:
+        :param sale_data.SaleData cheapest_now:
         """
-        self.cheap5_day = cheap5_day
-        self.cheap5_week = cheap5_week
-        self.ave_3day = ave3
-        self.cheapest = cheapest
+        self.cheap5_day_ave = cheap5_day_ave
+        self.cheap5_week_ave = cheap5_week_ave
+        self.cheapest_now = cheapest_now
+
+    def load(self, week_sale_list):
+        """
+        :param list[list[sale_data.SaleList]] week_sale_list:
+        :return:
+        """
+        sum_num = 0
+        sum_weighted_price = 0
+        # 日付についてループ
+        for day_delta in range(0, len(week_sale_list)):
+            if week_sale_list[day_delta]:
+                # 時刻についてループ
+                for hour in range(0, len(week_sale_list[day_delta])):
+                    sum_num = sum_num + week_sale_list[day_delta][hour].sum_num()
+                    sum_weighted_price = week_sale_list[day_delta][hour].sum_weighted_price()
+                    # 今日の直近の時間
+                    if day_delta == 0 and hour == 0:
+                        self.cheapest_now = week_sale_list[day_delta][hour].get_cheapest()
+                # 今日のデータ
+                if day_delta == 0:
+                    self.cheap5_day_ave = sum_weighted_price / sum_num
+        self.cheap5_week_ave = sum_weighted_price / sum_num
 
     def to_dict(self):
         dst = {
-            u'cheap5_day': self.cheap5_day,
-            u'cheap5_week': self.cheap5_week,
-            u'ave3': self.ave_3day,
-            u'cheapest': self.cheapest
+            u'cheap5_day_ave': self.cheap5_day_ave,
+            u'cheap5_week_ave': self.cheap5_week_ave,
+            u'cheapest_now': self.cheapest_now
         }
         return dst
 
@@ -31,44 +54,15 @@ class SendData(object):
     def __init__(self):
         self.send_items = {}
 
-    def load(self, save):
+    def load(self, save: save_data.SaveData):
         """
-        :param save_data.SaveData save:
+        :param SaveData save:
         """
+        # 全アイテムについてのループ
         for key, item in save.save_items.items():
-            save_item = save.save_items[key]  # type: save_data.SaveItem
-            sum_price = 0
-            cheap5_day = []  # type: list[dict[str, sale_data.SaleData]]
-            cheap5_week = []  # type: list[dict[str, sale_data.SaleData]]
-            cheapest = {}  # type: dict[str, int]
-            day_num = 120*1
-            # 3日分のデータもしくは配列の長さ分
-            ave_num = day_num*3
-            for i in range(0, len(save_item.week_sales)):
-                # 日別トップ5
-                if i < day_num:
-                    if len(cheap5_day) < 5 or save_item.week_sales[i].price < cheap5_day[-1]['price']:
-                        cheap5_day.append(save_item.week_sales[i].to_dict())
-                        cheap5_day.sort(key=lambda x: x['price'])
-                        cheap5_day = cheap5_day[0:min(len(cheap5_day), 5)]
-                # 週別トップ5
-                if len(cheap5_week) < 5 or save_item.week_sales[i].price < cheap5_week[-1]['price']:
-                    cheap5_week.append(save_item.week_sales[i].to_dict())
-                    cheap5_week.sort(key=lambda x: x['price'])
-                    cheap5_week = cheap5_week[0:min(len(cheap5_week), 5)]
-                # 3日平均
-                if i < ave_num:
-                    sum_price = sum_price + save_item.week_sales[i]
-                # 最安
-                if not cheapest or save_item.week_sales[i].price < cheapest['price']:
-                    cheapest = save_item.week_sales[i].to_dict()
-                # 同価格なら数の多い方を選ぶ
-                elif save_item.week_sales[i].price == cheapest['price'] and \
-                        save_item.week_sales[i].num > cheapest['num']:
-                    cheapest = save_item.week_sales[i].to_dict()
-            # 3日の平均を計算
-            ave3 = sum_price/ave_num
-            self.send_items[key] = SendItem(cheap5_day, cheap5_week, ave3, cheapest)
+            send_item = SendItem()
+            send_item.load(save.save_items[key].week_sale_lists)
+            self.send_items[key] = send_item
 
     def to_dict(self, category, item_dict):
         """
