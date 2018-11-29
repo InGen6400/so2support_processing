@@ -1,7 +1,7 @@
 from typing import List
 
 
-class SaleData(object):
+class SaleData:
 
     def __init__(self, price, num, area_id, pos_x, pos_y, bundle, user):
         self.price = price
@@ -22,7 +22,7 @@ class SaleData(object):
             u'area_id': self.area_id,
             u'pos_x': self.pos_x,
             u'pos_y': self.pos_y,
-            u'bundle': self.bundle,
+            u'bundle': bool(self.bundle),
             u'user': self.user
         }
         return ret
@@ -70,7 +70,7 @@ class SaleList(object):
                 max_price = self.sale_datas[0].price
             else:
                 max_price = self.sale_datas[-1].price
-            ave = self.sum_price()/self.sum_num()
+            ave = self.sum_weighted_price()/self.sum_num()
             # 最大で5つ，配列の長さが5以下なら配列の長さ
             top5 = self.sale_datas[:min(len(self.sale_datas), 5)]
             return min_price, max_price, ave, top5
