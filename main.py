@@ -13,10 +13,12 @@ import codecs
 import pprint
 import os
 
+from src.send_data import SendData
+
 PRICE_URL = 'https://so2-api.mutoys.com/json/sale/all.json'
 
 data = save_data.SaveData()
-sends = send_data.SendData()
+sends: SendData = send_data.SendData()
 
 # firebaseの初期化
 cred = credentials.Certificate('private/serviceAccountKey.json')
@@ -32,6 +34,8 @@ delta_time = datetime.datetime.today() - data.mod_time
 if delta_time.seconds > 60*11:
     print('Accessing API & Downloading Json data....')
     price_json = requests.get(PRICE_URL).json()
+    # デバッグ用
+    # price_json = json_loader.load_json_file('resources/prices.json')
     print('Json Downloaded.\n')
 
     print('start dumping and saving...')
@@ -59,7 +63,7 @@ if delta_time.seconds > 60*11:
         doc_ref = col_ref.document(cat)  # type: firestore.firestore.DocumentReference
         doc_ref.set(sends.to_dict(cat, items))
         print('Sent [' + cat + '] prices')
-    print('complete\n')
+    print('complete.\n')
     with open(os.path.join('save', 'log.txt'), 'a') as f:
         print('Success: ' + str(datetime.datetime.today()), file=f)
 else:

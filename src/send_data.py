@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from src import sale_data
 from src import save_data
 
@@ -44,12 +46,14 @@ class SendItem(object):
         dst = {
             u'cheap5_day_ave': self.cheap5_day_ave,
             u'cheap5_week_ave': self.cheap5_week_ave,
-            u'cheapest_now': self.cheapest_now
+            u'cheapest_now': self.cheapest_now.to_dict()
         }
         return dst
 
 
 class SendData(object):
+
+    send_items: Dict[str, SendItem]
 
     def __init__(self):
         self.send_items = {}

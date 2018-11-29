@@ -50,7 +50,7 @@ class SaveItem(object):
     def change_hour(self, old):
         sale_list = self.week_sale_lists[0][0]
         if sale_list:
-            self.today_graph.append(GraphData(sale_list.sum_price() / sale_list.sum_num(), old))
+            self.today_graph.append(GraphData(sale_list.sum_weighted_price() / sale_list.sum_num(), old))
 
     def __repr__(self):
         return 'SaveItem \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sale_lists, self.today_graph)
