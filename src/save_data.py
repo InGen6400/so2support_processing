@@ -35,7 +35,12 @@ class SaveItem(object):
 
     # データの追加
     def add(self, sale):
-        self.week_sale_lists[0][0].add(sale)
+        if not self.week_sale_lists:
+            self.week_sale_lists.append([SaleList(sale)])
+        elif not self.week_sale_lists[0]:
+            self.week_sale_lists[0].insert(0, SaleList(sale))
+        else:
+            self.week_sale_lists[0][0].add(sale)
 
     # 日付が変わったらグラフデータをファイルに出力
     def change_day(self, old):
@@ -46,11 +51,14 @@ class SaveItem(object):
         self.week_sale_lists.insert(0, [])
         self.week_sale_lists = self.week_sale_lists[:7]
 
-    # 時間が変わったら一時間の平均を今日のグラフデータに追加して一時間のデータを消す
+    # 時間が変わったら一時間の平均を今日のグラフデータに追加
     def change_hour(self, old):
-        sale_list = self.week_sale_lists[0][0]
-        if sale_list:
-            self.today_graph.append(GraphData(sale_list.sum_weighted_price() / sale_list.sum_num(), old))
+        if self.week_sale_lists[0]:
+            sale_list = self.week_sale_lists[0][0]
+            if sale_list:
+                self.today_graph.append(GraphData(sale_list.sum_weighted_price() / sale_list.sum_num(), old))
+            # 新しい時間の分を追加
+            self.week_sale_lists[0].insert(0, SaleList())
 
     def __repr__(self):
         return 'SaveItem \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sale_lists, self.today_graph)
