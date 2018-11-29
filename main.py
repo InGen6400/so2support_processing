@@ -12,7 +12,7 @@ import json
 import codecs
 import pprint
 import os
-'''
+
 PRICE_URL = 'https://so2-api.mutoys.com/json/sale/all.json'
 
 data = save_data.SaveData()
@@ -68,4 +68,4 @@ else:
     print('Not Enough Times')
     with open(os.path.join('save', 'log.txt'), 'a') as f:
         print('Failed-: ' + str(datetime.datetime.today()) + '\n\t Not Enough Times', file=f)
-'''
+

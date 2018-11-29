@@ -1,7 +1,6 @@
 import pickle
 import datetime
 import os
-from datetime import datetime
 from typing import List, Dict, Any
 
 from src import sale_data
@@ -63,7 +62,7 @@ class SaveData(object):
     day: int
     save_items: Dict[str, SaveItem]
 
-    def __init__(self, day=datetime.today().day, hour=datetime.today().hour):
+    def __init__(self, day=datetime.date.today().day, hour=datetime.datetime.today().hour):
         self.save_items = {}
         self.day = day
         self.hour = hour
@@ -71,6 +70,8 @@ class SaveData(object):
         if os.path.exists(os.path.join(save_dir, 'save_data.pkl')) & \
                 os.path.exists(os.path.join(save_dir, 'time_data.pkl')):
             self.load()
+        else:
+            self.save()
 
     def on_change_day(self, old):
         for item in self.save_items.values():
@@ -118,6 +119,7 @@ class SaveData(object):
         with open(os.path.join(save_dir, 'time_data.pkl'), mode='wb') as f:
             pickle.dump(self.day, f)
             pickle.dump(self.hour, f)
+            pickle.dump(datetime.datetime.today(), f)
 
     def save(self):
         with open(os.path.join(save_dir, 'save_data.pkl'), mode='wb') as f:
@@ -130,3 +132,4 @@ class SaveData(object):
         with open(os.path.join(save_dir, 'time_data.pkl'), mode='rb') as f:
             self.day = pickle.load(f)
             self.hour = pickle.load(f)
+            self.mod_time = pickle.load(f)
