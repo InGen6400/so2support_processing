@@ -28,7 +28,7 @@ class SaleData:
         return ret
 
     def __repr__(self):
-        return u'SaleData(price: {})'.format(self.price)
+        return u'SaleData(price: {} num:{})'.format(self.price, self.num)
 
 
 class SaleList(object):
@@ -59,7 +59,9 @@ class SaleList(object):
         return w_price
 
     def get_cheapest(self):
-        return min(self.sale_datas, key=lambda x: x.price)
+        min_sale = min(self.sale_datas, key=lambda x: x.price*100000+x.num)
+        min_price = min_sale.price
+        return [sale for sale in self.sale_datas if sale.price == min_price]
 
     # 最低，最大価格．平均，トップ5を計算する．
     def calc(self):
