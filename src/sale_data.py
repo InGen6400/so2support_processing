@@ -46,9 +46,20 @@ class SaleList(object):
     def add_individual(self, price, num, area_id, pos_x, pos_y, bundle, user):
         self.sale_datas.append(SaleData(price, num, area_id, pos_x, pos_y, bundle, user))
 
+    def get_cheap5(self):
+        sorted_data = sorted(self.sale_datas, key=lambda u: u.price*100000-u.num)
+        return sorted_data[:5]
+
     def sum_num(self):
         num = 0
         for data in self.sale_datas:
+            num = num + data.num
+        return num
+
+    def sum5_num(self):
+        num = 0
+        cheap5 = self.get_cheap5()
+        for data in cheap5:
             num = num + data.num
         return num
 
@@ -58,10 +69,16 @@ class SaleList(object):
             w_price = w_price + (data.price * data.num)
         return w_price
 
+    def sum5_weighted_price(self):
+        price = 0
+        cheap5 = self.get_cheap5()
+        for data in cheap5:
+            price = price + (data.price * data.num)
+        return price
+
     def get_cheapest(self):
         if self.sale_datas:
-            min_sale = min(self.sale_datas, key=lambda x: x.price*100000+x.num)
-            min_price = min_sale.price
+            min_price = min(self.sale_datas, key=lambda x: x.price*100000-x.num).price
             return [sale for sale in self.sale_datas if sale.price == min_price]
         else:
             return []

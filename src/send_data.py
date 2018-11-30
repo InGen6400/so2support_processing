@@ -36,9 +36,9 @@ class SendItem(object):
                 for hour in range(0, len(week_sale_list[day_delta])):
                     # 12分区切りについてループ
                     for dars in range(0, len(week_sale_list[day_delta][hour])):
-                        day_sum_num = day_sum_num + week_sale_list[day_delta][hour][dars].sum_num()
+                        day_sum_num = day_sum_num + week_sale_list[day_delta][hour][dars].sum5_num()
                         day_sum_price = day_sum_price + week_sale_list[day_delta][hour][dars]\
-                            .sum_weighted_price()
+                            .sum5_weighted_price()
                         # 今日の直近の時間
                         if day_delta == 0 and hour == 0 and dars == 0:
                             self.cheapest_now = week_sale_list[day_delta][hour][dars].get_cheapest()

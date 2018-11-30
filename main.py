@@ -29,7 +29,7 @@ item_list = json_loader.load_json_file('resources/item.json')
 items, cats = converter.convert_item_list(item_list)
 delta_time = datetime.datetime.today() - data.mod_time
 # 11分以上たっていないと実行されない
-if delta_time.seconds > 60*11:
+if 'offline' in sys.argv or delta_time.seconds > 60*11:
     try:
         print('Accessing API & Downloading Json data....')
         if 'offline' in sys.argv:
