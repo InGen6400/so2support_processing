@@ -11,6 +11,7 @@ import json
 import codecs
 import pprint
 import os
+import sys
 import traceback
 
 PRICE_URL = 'https://so2-api.mutoys.com/json/sale/all.json'
@@ -31,10 +32,13 @@ delta_time = datetime.datetime.today() - data.mod_time
 if delta_time.seconds > 60*11:
     try:
         print('Accessing API & Downloading Json data....')
-        price_json = requests.get(PRICE_URL).json()
-        # デバッグ用
-        # price_json = json_loader.load_json_file('resources/prices.json')
-        print('Json Downloaded.\n')
+        if 'offline' in sys.argv:
+            # デバッグ用
+            price_json = json_loader.load_json_file('resources/prices.json')
+            print('Json Loaded.\n')
+        else:
+            price_json = requests.get(PRICE_URL).json()
+            print('Json Downloaded.\n')
 
         print('start dumping and saving...')
         # 定期保存(テスト段階では呼び出し時間を記録しておく本番では1ファイルのみ)
@@ -54,12 +58,13 @@ if delta_time.seconds > 60*11:
         print('Creating send data...')
         sends.load(data)
         print('Send data created\n')
-        col_ref = db.collection(u'price_data')  # type: firestore.firestore.CollectionReference
-        print('sending...')
-        for cat in cats:
-            doc_ref = col_ref.document(cat)  # type: firestore.firestore.DocumentReference
-            doc_ref.set(sends.to_dict(cat, items))
-            print('Sent [' + cat + '] prices')
+        if 'offline' not in sys.argv:
+            col_ref = db.collection(u'price_data')  # type: firestore.firestore.CollectionReference
+            print('sending...')
+            for cat in cats:
+                doc_ref = col_ref.document(cat)  # type: firestore.firestore.DocumentReference
+                doc_ref.set(sends.to_dict(cat, items))
+                print('Sent [' + cat + '] prices')
     except Exception as e:
         with open(os.path.join('save', 'log.txt'), 'a') as f:
             print('Error: ' + traceback.format_exc(), file=f)

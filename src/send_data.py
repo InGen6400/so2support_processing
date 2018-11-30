@@ -22,7 +22,7 @@ class SendItem(object):
 
     def load(self, week_sale_list):
         """
-        :param list[list[sale_data.SaleList]] week_sale_list:
+        :param list[list[list[sale_data.SaleList]]] week_sale_list:
         :return:
         """
         sum_num = 0
@@ -30,16 +30,23 @@ class SendItem(object):
         # 日付についてループ
         for day_delta in range(0, len(week_sale_list)):
             if week_sale_list[day_delta]:
+                day_sum_num = 0
+                day_sum_price = 0
                 # 時刻についてループ
                 for hour in range(0, len(week_sale_list[day_delta])):
-                    sum_num = sum_num + week_sale_list[day_delta][hour].sum_num()
-                    sum_weighted_price = week_sale_list[day_delta][hour].sum_weighted_price()
-                    # 今日の直近の時間
-                    if day_delta == 0 and hour == 0:
-                        self.cheapest_now = week_sale_list[day_delta][hour].get_cheapest()
-                # 今日のデータ
-                if day_delta == 0:
-                    self.cheap5_day_ave = sum_weighted_price / sum_num
+                    # 12分区切りについてループ
+                    for dars in range(0, len(week_sale_list[day_delta][hour])):
+                        day_sum_num = day_sum_num + week_sale_list[day_delta][hour][dars].sum_num()
+                        day_sum_price = day_sum_price + week_sale_list[day_delta][hour][dars]\
+                            .sum_weighted_price()
+                        # 今日の直近の時間
+                        if day_delta == 0 and hour == 0 and dars == 0:
+                            self.cheapest_now = week_sale_list[day_delta][hour][dars].get_cheapest()
+                sum_num = sum_num + day_sum_num
+                sum_weighted_price = sum_weighted_price + day_sum_price
+                # 昨日のデータ
+                if day_delta == 1:
+                    self.cheap5_day_ave = day_sum_price / day_sum_num
         self.cheap5_week_ave = sum_weighted_price / sum_num
 
     def to_dict(self):
