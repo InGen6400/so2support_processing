@@ -6,7 +6,7 @@ from src import save_data
 
 class SendItem(object):
 
-    cheapest_now: sale_data.SaleData
+    cheapest_now: list[sale_data.SaleData]
     cheap5_week_ave: float
     cheap5_day_ave: float
 
@@ -14,7 +14,7 @@ class SendItem(object):
         """
         :param float cheap5_day_ave:
         :param float cheap5_week_ave:
-        :param sale_data.SaleData cheapest_now:
+        :param list[sale_data.SaleData] cheapest_now:
         """
         self.cheap5_day_ave = cheap5_day_ave
         self.cheap5_week_ave = cheap5_week_ave
@@ -50,10 +50,13 @@ class SendItem(object):
         self.cheap5_week_ave = sum_weighted_price / sum_num
 
     def to_dict(self):
+        cheapest_now = []
+        for cheapest in self.cheapest_now:
+            cheapest_now.append(cheapest.to_dict())
         dst = {
             u'cheap5_day_ave': self.cheap5_day_ave,
             u'cheap5_week_ave': self.cheap5_week_ave,
-            u'cheapest_now': self.cheapest_now.to_dict()
+            u'cheapest_now': cheapest_now
         }
         return dst
 
