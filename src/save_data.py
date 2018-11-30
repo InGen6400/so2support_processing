@@ -67,7 +67,8 @@ class SaveItem(object):
             for dars_sales in sale_list:
                 sum_price = sum_price + dars_sales.sum_weighted_price()
                 sum_num = sum_num + dars_sales.sum_num()
-            self.today_graph.append(GraphData(sum_price/sum_num, old))
+            if sum_num != 0:
+                self.today_graph.append(GraphData(sum_price/sum_num, old))
             # 新しい時間の分を追加
             self.week_sale_lists[0].insert(0, [SaleList()])
 
