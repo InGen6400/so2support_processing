@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, List
 
 from src import sale_data
 from src import save_data
@@ -6,7 +6,7 @@ from src import save_data
 
 class SendItem(object):
 
-    cheapest_now: list[sale_data.SaleData]
+    cheapest_now: List[sale_data.SaleData]
     cheap5_week_ave: float
     cheap5_day_ave: float
 
