@@ -46,8 +46,14 @@ class SendItem(object):
                 sum_weighted_price = sum_weighted_price + day_sum_price
                 # 昨日のデータ
                 if day_delta == 1:
-                    self.cheap5_day_ave = day_sum_price / day_sum_num
-        self.cheap5_week_ave = sum_weighted_price / sum_num
+                    if day_sum_num != 0:
+                        self.cheap5_day_ave = day_sum_price / day_sum_num
+                    else:
+                        self.cheap5_day_ave = 0
+        if sum_num != 0:
+            self.cheap5_week_ave = sum_weighted_price / sum_num
+        else:
+            self.cheap5_week_ave = 0
 
     def to_dict(self):
         cheapest_now = []
