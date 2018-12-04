@@ -67,7 +67,7 @@ if 'offline' in sys.argv or delta_time.seconds > 60*11:
                 print('Sent [' + cat + '] prices')
             col_ref = db.collection(u'time_stamp')
             doc_ref = col_ref.document('time')
-            doc_ref.set({"time": datetime.datetime.now()})
+            doc_ref.set({"time": datetime.datetime.utcnow()})
     except Exception as e:
         with open(os.path.join('save', 'log.txt'), 'a') as f:
             print('Error: '+str(datetime.datetime.today())+ '\n' + traceback.format_exc(), file=f)
