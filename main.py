@@ -65,9 +65,12 @@ if 'offline' in sys.argv or delta_time.seconds > 60*11:
                 doc_ref = col_ref.document(cat)  # type: firestore.firestore.DocumentReference
                 doc_ref.set(sends.to_dict(cat, items))
                 print('Sent [' + cat + '] prices')
+            col_ref = db.collection(u'time_stamp')
+            doc_ref = col_ref.document('time')
+            doc_ref.set({"time": datetime.datetime.now()})
     except Exception as e:
         with open(os.path.join('save', 'log.txt'), 'a') as f:
-            print('Error: ' + traceback.format_exc(), file=f)
+            print('Error: '+str(datetime.datetime.today())+ '\n' + traceback.format_exc(), file=f)
         raise
     else:
         print('complete.\n')
