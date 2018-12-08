@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from src import save_data
+from src import save_data, util
 from src import send_data
 from src import json_loader
 from src import converter
@@ -28,8 +28,9 @@ db = firestore.client()  # type: firestore.firestore.Client
 item_list = json_loader.load_json_file('resources/item.json')
 items, cats = converter.convert_item_list(item_list)
 delta_time = datetime.datetime.today() - data.mod_time
+util.file_log_e('Network Error:\n'+traceback.format_exc())
 # 11分以上たっていないと実行されない
-if 'offline' in sys.argv or delta_time.seconds > 60*11:
+if 'offline' in sys.argv or delta_time.seconds > 60*10:
     try:
         print('Accessing API & Downloading Json data....')
         if 'offline' in sys.argv:
@@ -40,6 +41,10 @@ if 'offline' in sys.argv or delta_time.seconds > 60*11:
             price_json = requests.get(PRICE_URL).json()
             print('Json Downloaded.\n')
 
+    except Exception as e:
+        util.file_log_e('Network Error:\n'+traceback.format_exc())
+        raise
+    try:
         print('start dumping and saving...')
         # 定期保存(テスト段階では呼び出し時間を記録しておく本番では1ファイルのみ)
         with codecs.open('resources/prices.json', 'w', 'utf-8') as f:
@@ -69,17 +74,14 @@ if 'offline' in sys.argv or delta_time.seconds > 60*11:
             doc_ref = col_ref.document('time')
             doc_ref.set({"time": datetime.datetime.utcnow()})
     except Exception as e:
-        with open(os.path.join('save', 'log.txt'), 'a') as f:
-            print('Error: '+str(datetime.datetime.today())+ '\n' + traceback.format_exc(), file=f)
+        util.file_log_e('Parse Error:\n'+traceback.format_exc())
         raise
     else:
         print('complete.\n')
-        with open(os.path.join('save', 'log.txt'), 'a') as f:
-            print('Success: ' + str(datetime.datetime.today()), file=f)
+        util.file_log_s('')
 else:
     print(str(datetime.datetime.today()) + ' - ' + str(data.mod_time))
     print('delta: ' + str(delta_time))
     print('Not Enough Times')
-    with open(os.path.join('save', 'log.txt'), 'a') as f:
-        print('Failed-: ' + str(datetime.datetime.today()) + '\n\t Not Enough Times', file=f)
+    util.file_log_f('Not Enough Times')
 

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from src import sale_data
+from src import sale_data, util
 from src import save_data
 
 
@@ -92,6 +92,9 @@ class SendData(object):
         """
         ret_dict = {}
         for key, item in self.send_items.items():
-            if item_dict[key]['category'] == category:
-                ret_dict[key] = item.to_dict()
+            if key in item_dict:
+                if item_dict[key]['category'] == category:
+                    ret_dict[key] = item.to_dict()
+            else:
+                util.file_log_e("item_dict don't have key:" + key)
         return ret_dict
