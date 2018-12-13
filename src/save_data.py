@@ -1,9 +1,11 @@
 import pickle
 import datetime
 import os
-from typing import List, Dict, Any
+from collections import deque
+from typing import List, Dict, Deque
 
-from src import sale_data
+from src import sale_data, util
+from src.comp_data import CompSaleList
 from src.sale_data import SaleList
 
 save_dir = 'save'
@@ -24,30 +26,29 @@ class GraphData(object):
 
 class SaveItem(object):
 
+    week_comp_list: Deque[CompSaleList]
     today_graph: List[GraphData]
-    week_sale_lists: List[List[List[SaleList]]]
+    today_sales: List[List[SaleList]]
 
     def __init__(self, sale):
-        # week_sales[7*120]
-        self.week_sale_lists = [[[sale_data.SaleList(sale)]]]
+        # today_sales[hour][dars]
+        self.today_sales = [[sale_data.SaleList(sale)]]
         # today_graph[<24]
         self.today_graph = []
+        self.week_comp_list = deque(maxlen=7)
 
     # データの追加
     def add(self, sale):
-        if not self.week_sale_lists[0][0]:
+        if not self.today_sales[0]:
             self.new_dars(sale)
         else:
-            self.week_sale_lists[0][0][0].add(sale)
-
-    def new_day(self, sale=None):
-        self.week_sale_lists.insert(0, [[SaleList(sale)]])
+            self.today_sales[0][0].add(sale)
 
     def new_hour(self, sale=None):
-        self.week_sale_lists[0].insert(0, [SaleList(sale)])
+        self.today_sales.insert(0, [SaleList(sale)])
 
     def new_dars(self, sale=None):
-        self.week_sale_lists[0][0].insert(0, SaleList(sale))
+        self.today_sales[0].insert(0, SaleList(sale))
 
     # 日付が変わったらグラフデータをファイルに出力
     def change_day(self, old):
@@ -55,13 +56,15 @@ class SaveItem(object):
         with open(os.path.join(graph_dir, graph_file_name + day_str + '.pkl'), mode='wb') as f:
             pickle.dump(self.today_graph, f)
         self.today_graph = []
-        self.week_sale_lists.insert(0, [[SaleList()]])
-        self.week_sale_lists = self.week_sale_lists[:7]
+        # 今日一日のデータを圧縮して保存
+        self.week_comp_list.append(CompSaleList(self.today_sales))
+        # 今日のデータをクリア
+        self.today_sales.clear()
 
     # 時間が変わったら一時間の平均を今日のグラフデータに追加
     def change_hour(self, old):
-        if self.week_sale_lists[0]:
-            sale_list = self.week_sale_lists[0][0]
+        if self.today_sales:
+            sale_list: List[SaleList] = self.today_sales[0]
             sum_price = 0
             sum_num = 0
             for dars_sales in sale_list:
@@ -70,7 +73,9 @@ class SaveItem(object):
             if sum_num != 0:
                 self.today_graph.append(GraphData(sum_price/sum_num, old))
             # 新しい時間の分を追加
-            self.week_sale_lists[0].insert(0, [SaleList()])
+            self.today_sales.append([SaleList()])
+        else:
+            util.file_log_e()
 
     def __repr__(self):
         return 'SaveItem \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sale_lists, self.today_graph)

@@ -16,7 +16,7 @@ class SaleData:
         return other + self.price
 
     def to_dict(self):
-        ret = {
+        return {
             u'price': self.price,
             u'num': self.num,
             u'area_id': self.area_id,
@@ -25,7 +25,6 @@ class SaleData:
             u'bundle': bool(self.bundle),
             u'user': self.user
         }
-        return ret
 
     def __repr__(self):
         return u'SaleData(price: {} num:{})'.format(self.price, self.num)
