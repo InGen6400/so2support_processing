@@ -3,12 +3,12 @@ import inspect
 import os
 
 
-def file_log_e(msg):
+def file_log_e(msg: str):
     frame = inspect.currentframe().f_back
     with open(os.path.join('save', 'log.txt'), 'a') as f:
         print('Error--: ' + str(datetime.datetime.today()) + ' ' +
               os.path.basename(frame.f_code.co_filename) + ':' +
-              frame.f_lineno +
+              str(frame.f_lineno) +
               '\n\t'+msg, file=f)
 
 

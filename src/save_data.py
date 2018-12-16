@@ -1,6 +1,7 @@
 import pickle
 import datetime
 import os
+import sys
 from collections import deque
 from typing import List, Dict, Deque
 
@@ -39,16 +40,13 @@ class SaveItem(object):
 
     # データの追加
     def add(self, sale):
-        if not self.today_sales[0]:
+        if not self.today_sales[-1]:
             self.new_dars(sale)
         else:
-            self.today_sales[0][0].add(sale)
-
-    def new_hour(self, sale=None):
-        self.today_sales.insert(0, [SaleList(sale)])
+            self.today_sales[-1][-1].add(sale)
 
     def new_dars(self, sale=None):
-        self.today_sales[0].insert(0, SaleList(sale))
+        self.today_sales[-1].append(SaleList(sale))
 
     # 日付が変わったらグラフデータをファイルに出力
     def change_day(self, old):
@@ -60,11 +58,12 @@ class SaveItem(object):
         self.week_comp_list.append(CompSaleList(self.today_sales))
         # 今日のデータをクリア
         self.today_sales.clear()
+        self.today_sales = [[SaleList()]]
 
     # 時間が変わったら一時間の平均を今日のグラフデータに追加
     def change_hour(self, old):
         if self.today_sales:
-            sale_list: List[SaleList] = self.today_sales[0]
+            sale_list: List[SaleList] = self.today_sales[-1]
             sum_price = 0
             sum_num = 0
             for dars_sales in sale_list:
@@ -75,10 +74,20 @@ class SaveItem(object):
             # 新しい時間の分を追加
             self.today_sales.append([SaleList()])
         else:
-            util.file_log_e()
+            util.file_log_e('no today sale')
 
     def __repr__(self):
-        return 'SaveItem \n \tweek_sales:{} \n \ttoday_graph:{}'.format(self.week_sale_lists, self.today_graph)
+        ret = 'SaveItem \n'
+        ret = ret + '\ttoday_graph:\n\t\t{}\n'.format(self.today_graph)
+        ret = ret+'\ttoday_sales:\n'
+        for hour in range(0, len(self.today_sales)):
+            for dars in range(0, len(self.today_sales[hour])):
+                ret = ret + '\t\ttime ' + str(hour) + ',' + str(dars) + ': ' +\
+                      self.today_sales[hour][dars].__repr__() + '\n'
+        ret = ret + '\tweek_comp_list\n'
+        for day in range(0, len(self.week_comp_list)):
+            ret = ret + '\t\tday ' + str(day) + ': ' + str(self.week_comp_list[day].to_dict())
+        return ret
 
 
 class SaveData(object):
@@ -87,10 +96,10 @@ class SaveData(object):
     day: int
     save_items: Dict[str, SaveItem]
 
-    def __init__(self, day=datetime.date.today().day, hour=datetime.datetime.today().hour):
+    def __init__(self, date=datetime.datetime.today()):
         self.save_items = {}
-        self.day = day
-        self.hour = hour
+        self.day = date.day
+        self.hour = date.hour
         self.mod_time = datetime.datetime.today()
         if os.path.exists(os.path.join(save_dir, 'save_data.pkl')) & \
                 os.path.exists(os.path.join(save_dir, 'time_data.pkl')):
@@ -150,7 +159,10 @@ class SaveData(object):
         with open(os.path.join(save_dir, 'time_data.pkl'), mode='wb') as f:
             pickle.dump(self.day, f)
             pickle.dump(self.hour, f)
-            pickle.dump(datetime.datetime.today(), f)
+            if 'oneday' in sys.argv:
+                pickle.dump(datetime.datetime.today() - datetime.timedelta(days=1), f)
+            else:
+                pickle.dump(datetime.datetime.today(), f)
 
     def save(self):
         with open(os.path.join(save_dir, 'save_data.pkl'), mode='wb') as f:
