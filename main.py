@@ -18,9 +18,12 @@ import traceback
 PRICE_URL = 'https://so2-api.mutoys.com/json/sale/all.json'
 
 
-@profile
+#@profile
 def main():
-    data = save_data.SaveData()
+    if 'oneday' in sys.argv:
+        data = save_data.SaveData(datetime.datetime.today() - datetime.timedelta(days=1))
+    else:
+        data = save_data.SaveData(datetime.datetime.today())
     sends: send_data.SendData = send_data.SendData()
 
     # firebaseの初期化
@@ -32,6 +35,8 @@ def main():
     item_list = json_loader.load_json_file('resources/item.json')
     items, cats = converter.convert_item_list(item_list)
     delta_time = datetime.datetime.today() - data.mod_time
+    if 'oneday' in sys.argv:
+        delta_time = delta_time - datetime.timedelta(days=1)
     # 11分以上たっていないと実行されない
     if 'offline' in sys.argv or delta_time.seconds > 60*10:
         try:
@@ -61,6 +66,7 @@ def main():
             print('Save data loading...')
             data.load_json(price_json)
             print('Save data loaded\n')
+            #print(data.save_items['1'])
             data.save()
             print('Save data saved\n')
             print('Creating send data...')

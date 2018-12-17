@@ -26,23 +26,21 @@ class SendItem(object):
         sum_weighted_price = 0
         # 日付についてループ
         for day_delta in range(0, len(save.week_comp_list)):
-            if save.week_comp_list[day_delta]:
-                day_num = save.week_comp_list[day_delta].sum_num
-                day_w_price = save.week_comp_list[day_delta].sum_weighted_price
-                sum_num = sum_num + day_num
-                sum_weighted_price = sum_weighted_price + day_w_price
-                # 昨日のデータ
-                if day_delta == 1:
-                    if day_num != 0:
-                        self.cheap5_day_ave = day_w_price / day_num
-                    else:
-                        self.cheap5_day_ave = 0
+            day_num = save.week_comp_list[day_delta].sum_num
+            day_w_price = save.week_comp_list[day_delta].sum_weighted_price
+            sum_num = sum_num + day_num
+            sum_weighted_price = sum_weighted_price + day_w_price
+            # 昨日のデータ
+            if day_delta == 1:
+                if day_num != 0:
+                    self.cheap5_day_ave = day_w_price / day_num
+                else:
+                    self.cheap5_day_ave = 0
         if sum_num != 0:
             self.cheap5_week_ave = sum_weighted_price / sum_num
         else:
             self.cheap5_week_ave = 0
-        if save.today_sales and save.today_sales[0] and save.today_sales[0][0]:
-            self.cheapest_now = save.today_sales[0][0].get_cheapest()
+        self.cheapest_now = save.today_sales[-1][-1].get_cheapest()
 
     def to_dict(self):
         cheapest_now = []
